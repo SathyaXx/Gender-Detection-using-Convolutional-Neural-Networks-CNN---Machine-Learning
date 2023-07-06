@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload Image</title>
+</head>
+
+<style>
+    #preview {
+        max-width: 300px;
+    }
+
+    #result{
+        background-color: black;
+        color: white;
+        margin-top: 20px;
+    }
+</style>
+<body>
+    <h1>Gender Detection</h1>
+    <form id="imageForm" enctype="multipart/form-data">
+        <input type="file" name="image" id="imageInput" accept=".jpg, .jpeg, .png, .bmp, .BMP" onchange="displayImage(event)">
+        <button type="button" onclick="uploadImage()">Upload</button>
+    </form>
+    <img id="preview" width="500" height="500" src="" alt="Preview">
+    <p id="Result"></p>
+    <script>
+
+        function displayImage(event) {
+            var imageInput = event.target;
+            var previewImage = document.getElementById('preview');
+
+            if (imageInput.files && imageInput.files[0]) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    previewImage.src = e.target.result;
+                };
+
+                reader.readAsDataURL(imageInput.files[0]);
+            }
+        }
+
+
+        function uploadImage() {
+            // Get the image input element
+            var imageInput = document.getElementById('imageInput');
+            // Create a FormData object and append the selected image file
+            var formData = new FormData();
+            formData.append('image', imageInput.files[0]);
+
+            // Create an AJAX request
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', 'http://localhost:5000/detect');  // Replace with the appropriate URL of your Flask server
+
+            // Define the response handler
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    var result = JSON.parse(xhr.responseText);
+                    document.getElementById("Result").innerHTML="Result : "+result.result;
+                } else {
+                    console.log('Error:', xhr.responseText);
+                }
+            };
+
+            // Send the FormData object
+            xhr.send(formData);
+        }
+    </script>
+</body>
+</html>
+
+
